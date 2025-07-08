@@ -1,0 +1,114 @@
+2025-07-02 01:40:27,239 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 01:40:27,244 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 01:40:27,244 - CRITICAL - [instagram_automation] - A fatal error occurred: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'NoneType'
+Traceback (most recent call last):
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 616, in <module>
+    yt_publisher = YouTubePublisher(config, rate_limiter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 381, in __init__
+    self.service = self._authenticate()
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 386, in _authenticate
+    token_file = Path(self.config.get('token_file', 'youtube_token.pickle'))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\pathlib.py", line 1162, in __init__
+    super().__init__(*args)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\pathlib.py", line 373, in __init__
+    raise TypeError(
+TypeError: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'NoneType'
+2025-07-02 01:42:11,094 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 01:42:11,094 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 01:42:11,094 - ERROR - [instagram_automation] - YouTube client secrets file not found at youtube_credentials.json
+2025-07-02 01:42:11,094 - INFO - [instagram_automation] - Social Media Automation Engine v2.0 Started.
+2025-07-02 01:53:33,336 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 01:53:33,340 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 01:53:33,340 - ERROR - [instagram_automation] - YouTube client secrets file not found at youtube_credentials.json
+2025-07-02 01:53:33,340 - INFO - [instagram_automation] - Social Media Automation Engine v2.0 Started.
+2025-07-02 01:55:53,217 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 01:55:53,220 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 01:55:53,222 - ERROR - [instagram_automation] - YouTube client secrets file not found at youtube_credentials.json
+2025-07-02 01:55:53,222 - INFO - [instagram_automation] - Social Media Automation Engine v2.0 Started.
+2025-07-02 02:13:00,006 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 02:13:00,009 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 02:13:00,012 - ERROR - [instagram_automation] - YouTube client secrets file not found at youtube_credentials.json
+2025-07-02 02:13:00,012 - INFO - [instagram_automation] - Social Media Automation Engine v2.0 Started.
+2025-07-02 02:17:13,928 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 02:17:13,929 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 02:17:13,929 - ERROR - [instagram_automation] - YouTube client secrets file not found at youtube_credentials.json
+2025-07-02 02:17:13,929 - INFO - [instagram_automation] - Social Media Automation Engine v2.0 Started.
+2025-07-02 15:20:01,413 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 15:20:01,414 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 15:20:01,414 - ERROR - [instagram_automation] - YouTube client secrets file not found at youtube_credentials.json
+2025-07-02 15:20:01,414 - CRITICAL - [instagram_automation] - A fatal error occurred: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'NoneType'
+Traceback (most recent call last):
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 616, in <module>
+    drive_service     = GoogleDriveService(config, rate_limiter)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 118, in __init__
+    self.service = self._authenticate()
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 123, in _authenticate
+    token_file = Path(self.config.get('token_file', 'token.pickle'))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\pathlib.py", line 1162, in __init__
+    super().__init__(*args)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\pathlib.py", line 373, in __init__
+    raise TypeError(
+TypeError: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'NoneType'
+2025-07-02 15:42:01,360 - INFO - [dev_runner] - Logging initialized for DEVELOPMENT run.
+2025-07-02 15:42:01,361 - INFO - [dev_runner] - Instantiating MOCK services...
+2025-07-02 15:42:01,361 - INFO - [dev_runner] - All MOCK services are ready.
+2025-07-02 15:42:01,361 - INFO - [instagram_automation] - Starting new automation cycle.
+2025-07-02 15:42:01,361 - INFO - [instagram_automation] - Path A: Instagram inspiration.
+2025-07-02 15:42:01,362 - INFO - [mock_services] - MOCK: Pretending to get top inspirational post.
+2025-07-02 15:42:01,362 - INFO - [mock_services] - MOCK: Pretending to generate content from inspiration.
+2025-07-02 15:42:01,362 - INFO - [mock_services] - MOCK: Pretending to post image to Instagram: A mock caption for Instagram.
+2025-07-02 15:42:01,362 - INFO - [mock_services] - MOCK: Pretending to post to Facebook: A mock post for Facebook.
+2025-07-02 15:42:01,363 - INFO - [instagram_automation] - HTML dashboard has been updated.
+2025-07-02 15:42:01,364 - INFO - [instagram_automation] - Cycle complete.
+2025-07-02 16:41:15,981 - INFO - [instagram_automation] - Logging initialized.
+2025-07-02 16:41:15,998 - INFO - [instagram_automation] - Facebook service initialized.
+2025-07-02 16:41:16,000 - CRITICAL - [instagram_automation] - A fatal error occurred: 'youtube'
+Traceback (most recent call last):
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 602, in <module>
+    yt_publisher = YouTubePublisher(config, rate_limiter, auth)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dwary\OneDrive\Desktop\Freelance Project 1\instagram_automation.py", line 373, in __init__
+    self.config = config['youtube'] # Keep non-sensitive config
+                  ~~~~~~^^^^^^^^^^^
+KeyError: 'youtube'
+2025-07-02 16:47:24,204 - INFO - [dev_runner] - Logging initialized for DEVELOPMENT run.
+2025-07-02 16:47:24,216 - INFO - [dev_runner] - Instantiating MOCK services...
+2025-07-02 16:47:24,216 - INFO - [dev_runner] - All MOCK services are ready.
+2025-07-02 16:47:24,216 - INFO - [instagram_automation] - Starting new automation cycle.
+2025-07-02 16:47:24,216 - INFO - [instagram_automation] - Path B: Google Drive content.
+2025-07-02 16:47:24,216 - INFO - [mock_services] - MOCK: Pretending to look for new files in Google Drive.
+2025-07-02 16:47:24,216 - INFO - [instagram_automation] - HTML dashboard has been updated.
+2025-07-02 16:47:24,219 - INFO - [instagram_automation] - Cycle complete.
+2025-07-02 16:54:00,466 - INFO - [dev_runner] - Logging initialized for DEVELOPMENT run.
+2025-07-02 16:54:00,468 - INFO - [dev_runner] - Instantiating MOCK services...
+2025-07-02 16:54:00,468 - INFO - [dev_runner] - All MOCK services are ready.
+2025-07-02 16:54:00,468 - INFO - [instagram_automation] - Starting new automation cycle.
+2025-07-02 16:54:00,468 - INFO - [instagram_automation] - Path A: Instagram inspiration.
+2025-07-02 16:54:00,471 - INFO - [mock_services] - MOCK: Pretending to get top inspirational post.
+2025-07-02 16:54:00,471 - INFO - [mock_services] - MOCK: Pretending to generate content from inspiration.
+2025-07-02 16:54:00,471 - INFO - [mock_services] - MOCK: Pretending to post image to Instagram: A mock caption for Instagram.
+2025-07-02 16:54:00,471 - INFO - [mock_services] - MOCK: Pretending to post to Facebook: A mock post for Facebook.
+2025-07-02 16:54:00,471 - INFO - [instagram_automation] - HTML dashboard has been updated.
+2025-07-02 16:54:00,474 - INFO - [instagram_automation] - Cycle complete.
+2025-07-02 17:31:20,845 - INFO - [dev_runner] - Logging initialized for DEVELOPMENT run.
+2025-07-02 17:31:20,848 - INFO - [dev_runner] - Instantiating MOCK services...
+2025-07-02 17:31:20,849 - INFO - [dev_runner] - All MOCK services are ready.
+2025-07-02 17:31:20,850 - INFO - [instagram_automation] - Starting new automation cycle.
+2025-07-02 17:31:20,851 - INFO - [instagram_automation] - Path B: Google Drive content.
+2025-07-02 17:31:20,851 - INFO - [mock_services] - MOCK: Pretending to look for new files in Google Drive.
+2025-07-02 17:31:20,854 - INFO - [instagram_automation] - HTML dashboard has been updated.
+2025-07-02 17:31:20,856 - INFO - [instagram_automation] - Cycle complete.
+2025-07-02 19:09:50,667 - INFO - [dev_runner] - Logging initialized for DEVELOPMENT run.
+2025-07-02 19:09:50,705 - INFO - [dev_runner] - Instantiating MOCK services...
+2025-07-02 19:09:50,707 - INFO - [dev_runner] - All MOCK services are ready.
+2025-07-02 19:09:50,710 - INFO - [instagram_automation] - Starting new automation cycle.
+2025-07-02 19:09:50,711 - INFO - [instagram_automation] - Path B: Google Drive content.
+2025-07-02 19:09:50,711 - INFO - [mock_services] - MOCK: Pretending to look for new files in Google Drive.
+2025-07-02 19:09:50,713 - INFO - [instagram_automation] - HTML dashboard has been updated.
+2025-07-02 19:09:50,718 - INFO - [instagram_automation] - Cycle complete.

@@ -1,0 +1,17 @@
+{
+  "instagram": {
+    "target_username": "sawantrajtejraj",
+    "max_posts_to_scan": 25
+  },
+  "openai": {
+    "model": "gpt-4-turbo"
+  },
+  "scheduling": {
+    "post_time_1": "09:00",
+    "post_time_2": "17:00"
+  },
+  "settings": {
+    "log_file": "automation.log",
+    "processed_posts_db": "processed_posts.json"
+  }
+}

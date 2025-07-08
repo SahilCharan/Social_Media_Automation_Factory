@@ -1,0 +1,69 @@
+{
+  "name": "Instagram Content Automation",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "instagram-data",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Process Instagram data\nconst posts = items[0].json.posts || [];\nconst analysis = items[0].json.analysis || {};\n\n// Extract insights\nconst insights = {\n  totalPosts: posts.length,\n  avgEngagement: posts.reduce((sum, p) => sum + p.likes + p.comments, 0) / posts.length,\n  topPerformer: posts.reduce((max, p) => (p.likes + p.comments) > (max.likes + max.comments) ? p : max, posts[0]),\n  recommendations: analysis.performance_insights?.content_recommendations || []\n};\n\nreturn [{json: insights}];"
+      },
+      "name": "Process Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "#instagram-insights",
+        "text": "New Instagram analysis complete!\n\nTotal Posts: {{$json.totalPosts}}\nAvg Engagement: {{$json.avgEngagement}}\nTop Post: {{$json.topPerformer.shortcode}}\n\nRecommendations:\n{{$json.recommendations.join('\\n')}}"
+      },
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Data": {
+      "main": [
+        [
+          {
+            "node": "Send to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
