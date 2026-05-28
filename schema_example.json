@@ -1,0 +1,49 @@
+{
+  "pm_name": "Kavitha",
+  "report_type": "MORNING BRIEF",
+  "date_label": "Wednesday, 27 May 2026",
+  "generated_at": "27 May 2026, 10:30 AM IST",
+  "health": "YELLOW",
+  "brands": [
+    {
+      "name": "Mindful Goods",
+      "tasks": [
+        {
+          "id": "abc123xyz",
+          "name": "NZ Honey Co — Social Media Pack May",
+          "status": "sent for approval",
+          "due": "Today",
+          "assignee": "Anuvrath",
+          "flags": ["SEND_NOW", "OVERDUE_TODAY"],
+          "last_comment": "Tiz (client, 2h ago): Any update on the pack?",
+          "reply_draft": "Hi Tiz — we're finalising the May pack now and will share it with you by 3pm today. Sorry for the delay."
+        },
+        {
+          "id": "def456uvw",
+          "name": "Mark J — Blog Post June",
+          "status": "changes done",
+          "due": "Tomorrow",
+          "assignee": "Dhruv",
+          "flags": ["NEEDS_PM_REVIEW", "DUE_TOMORROW"],
+          "last_comment": "Dhruv: Changes done, ready for review",
+          "reply_draft": null
+        }
+      ]
+    },
+    {
+      "name": "Brand B",
+      "tasks": [
+        {
+          "id": "ghi789rst",
+          "name": "Brand B — Instagram Reels Q2",
+          "status": "under client review",
+          "due": "28 May 2026",
+          "assignee": "Mansi",
+          "flags": ["CLIENT_REPLY_WAITING"],
+          "last_comment": "PM: Sent for review 4 days ago",
+          "reply_draft": null
+        }
+      ]
+    }
+  ]
+}

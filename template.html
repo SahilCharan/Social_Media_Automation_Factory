@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>{{REPORT_TITLE}}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+  .topbar{background:#1a1d2e;border-bottom:1px solid #2d3748;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .logo{font-size:18px;font-weight:700;color:#7c3aed;letter-spacing:-0.5px}
+  .report-title{font-size:14px;color:#94a3b8}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .health-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px}
+  .health-green{background:#052e16;color:#4ade80;border:1px solid #16a34a}
+  .health-yellow{background:#422006;color:#fbbf24;border:1px solid #d97706}
+  .health-red{background:#450a0a;color:#f87171;border:1px solid #dc2626}
+  .stats-bar{background:#151820;border-bottom:1px solid #2d3748;padding:12px 24px;display:flex;gap:24px;overflow-x:auto}
+  .stat-pill{display:flex;align-items:center;gap:8px;background:#1e2235;border:1px solid #2d3748;border-radius:8px;padding:8px 14px;white-space:nowrap}
+  .stat-num{font-size:20px;font-weight:700}
+  .stat-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px}
+  .num-red{color:#f87171}
+  .num-orange{color:#fb923c}
+  .num-yellow{color:#fbbf24}
+  .num-green{color:#4ade80}
+  .num-blue{color:#60a5fa}
+  .num-white{color:#e2e8f0}
+  .toolbar{padding:12px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#111318;border-bottom:1px solid #1e2235}
+  .search-box{flex:1;min-width:200px;max-width:340px;background:#1a1d2e;border:1px solid #2d3748;border-radius:6px;padding:7px 12px;color:#e2e8f0;font-size:13px;outline:none}
+  .search-box:focus{border-color:#7c3aed}
+  .filter-btn{padding:6px 14px;border-radius:6px;border:1px solid #2d3748;background:#1a1d2e;color:#94a3b8;font-size:12px;cursor:pointer;transition:all 0.15s}
+  .filter-btn:hover,.filter-btn.active{background:#7c3aed;border-color:#7c3aed;color:#fff}
+  .main{padding:20px 24px}
+  .brand-block{margin-bottom:28px}
+  .brand-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#1a1d2e;border:1px solid #2d3748;border-radius:8px 8px 0 0;cursor:pointer;user-select:none}
+  .brand-dot{width:10px;height:10px;border-radius:50%;background:#7c3aed}
+  .brand-name{font-size:14px;font-weight:700;color:#e2e8f0;flex:1}
+  .brand-count{font-size:12px;color:#94a3b8;background:#0f1117;padding:2px 8px;border-radius:12px}
+  .brand-chevron{font-size:10px;color:#94a3b8;transition:transform 0.2s}
+  .brand-chevron.open{transform:rotate(90deg)}
+  .tasks-table{width:100%;border-collapse:collapse;background:#131620;border:1px solid #2d3748;border-top:none;border-radius:0 0 8px 8px;overflow:hidden}
+  .tasks-table th{background:#0d0f18;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;padding:9px 14px;text-align:left;border-bottom:1px solid #2d3748;white-space:nowrap}
+  .tasks-table td{padding:10px 14px;border-bottom:1px solid #1e2235;font-size:13px;vertical-align:middle}
+  .tasks-table tr:last-child td{border-bottom:none}
+  .tasks-table tr:hover td{background:#1a1d2e}
+  .task-name{font-weight:500;color:#cbd5e1;max-width:260px}
+  .task-name a{color:#818cf8;text-decoration:none}
+  .task-name a:hover{text-decoration:underline}
+  .flag-chips{display:flex;flex-wrap:wrap;gap:4px}
+  .chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+  .chip-red{background:#450a0a;color:#f87171;border:1px solid #7f1d1d}
+  .chip-orange{background:#431407;color:#fb923c;border:1px solid #7c2d12}
+  .chip-yellow{background:#422006;color:#fbbf24;border:1px solid #78350f}
+  .chip-green{background:#052e16;color:#4ade80;border:1px solid #14532d}
+  .chip-blue{background:#172554;color:#60a5fa;border:1px solid #1e3a8a}
+  .chip-purple{background:#2e1065;color:#c084fc;border:1px solid #4c1d95}
+  .chip-gray{background:#1e2235;color:#94a3b8;border:1px solid #2d3748}
+  .status-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#1e2235;color:#94a3b8;white-space:nowrap}
+  .due-overdue{color:#f87171;font-weight:600}
+  .due-today{color:#fb923c;font-weight:600}
+  .due-soon{color:#fbbf24}
+  .due-ok{color:#94a3b8}
+  .assignee-tag{font-size:11px;color:#64748b;white-space:nowrap}
+  .action-btn{padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+  .btn-send{background:#7c3aed;color:#fff}
+  .btn-send:hover{background:#6d28d9}
+  .btn-review{background:#0369a1;color:#fff}
+  .btn-review:hover{background:#075985}
+  .btn-chase{background:#b45309;color:#fff}
+  .btn-chase:hover{background:#92400e}
+  .empty-state{text-align:center;padding:40px;color:#4a5568}
+  .section-divider{padding:6px 24px 2px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568}
+  .last-comment{font-size:11px;color:#64748b;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .reply-draft{font-size:11px;color:#818cf8;font-style:italic;cursor:pointer;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .reply-draft:hover{color:#a78bfa}
+  [data-hidden]{display:none!important}
+  .footer{text-align:center;padding:20px;font-size:11px;color:#374151;border-top:1px solid #1e2235;margin-top:20px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">WorkinX</span>
+    <span class="report-title" id="reportTitle">{{REPORT_TITLE}}</span>
+  </div>
+  <div class="topbar-right">
+    <span class="health-badge {{HEALTH_CLASS}}" id="healthBadge">{{HEALTH_ICON}} {{HEALTH_LABEL}}</span>
+    <span style="font-size:12px;color:#64748b" id="genTime">Generated {{GENERATED_AT}}</span>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar">
+  <!-- injected by render.py -->
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <input class="search-box" type="text" id="searchBox" placeholder="Search tasks, brands, status..." oninput="applyFilters()"/>
+  <button class="filter-btn active" onclick="setFilter('ALL',this)">All</button>
+  <button class="filter-btn" onclick="setFilter('CLIENT_WAITING',this)">🔴 Client Waiting</button>
+  <button class="filter-btn" onclick="setFilter('ESCALATION',this)">🚨 Escalation</button>
+  <button class="filter-btn" onclick="setFilter('DUE_TODAY',this)">🟠 Due Today</button>
+  <button class="filter-btn" onclick="setFilter('SLA_BREACH',this)">⚠️ SLA</button>
+  <button class="filter-btn" onclick="setFilter('WIN',this)">🏆 Wins</button>
+  <button class="filter-btn" onclick="setFilter('PROTOCOL_BREACH',this)">🔁 Breach</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="mainContent">
+  <!-- injected by render.py -->
+</div>
+
+<div class="footer" id="footer">{{FOOTER_TEXT}}</div>
+
+<script>
+var REPORT_DATA = {{REPORT_DATA_JSON}};
+var activeFilter = 'ALL';
+
+function chipHtml(flag) {
+  var map = {
+    'CLIENT_WAITING':   ['chip-red',    '🔴 Client Waiting'],
+    'ESCALATION':       ['chip-red',    '🚨 Escalation'],
+    'DUE_TODAY':        ['chip-orange', '🟠 Due Today'],
+    'DUE_TOMORROW':     ['chip-yellow', '🟡 Due Tomorrow'],
+    'DUE_SOON':         ['chip-yellow', '⏰ Due Soon'],
+    'SLA_BREACH':       ['chip-orange', '⚠️ SLA Breach'],
+    'JUST_UPDATED':     ['chip-blue',   '🆕 Just Updated'],
+    'WIN':              ['chip-green',  '🏆 Win'],
+    'PROTOCOL_BREACH':  ['chip-purple', '🔁 No Comment'],
+    'SEND_NOW':         ['chip-red',    '📤 Send Now'],
+    'NEEDS_PM_REVIEW':  ['chip-blue',   '👁️ Review'],
+    'BLOCKED':          ['chip-orange', '🚧 Blocked'],
+    'OVERDUE_TODAY':    ['chip-red',    '🔴 Overdue'],
+    'INCOMPLETE':       ['chip-yellow', '⚠️ Incomplete'],
+    'STATUS_MISMATCH':  ['chip-purple', '⚡ Mismatch'],
+  };
+  var entry = map[flag] || ['chip-gray', flag];
+  return '<span class="chip ' + entry[0] + '">' + entry[1] + '</span>';
+}
+
+function dueClass(dueStr) {
+  if (!dueStr || dueStr === 'no due') return 'due-ok';
+  if (dueStr.indexOf('OVERDUE') > -1) return 'due-overdue';
+  if (dueStr.indexOf('Today') > -1) return 'due-today';
+  if (dueStr.indexOf('Tomorrow') > -1) return 'due-soon';
+  return 'due-ok';
+}
+
+function buildStats(data) {
+  var counts = {total:0, esc:0, client:0, wins:0, incomplete:0, sla:0};
+  data.brands.forEach(function(b){
+    b.tasks.forEach(function(t){
+      counts.total++;
+      if(t.flags.indexOf('ESCALATION')>-1) counts.esc++;
+      if(t.flags.indexOf('CLIENT_WAITING')>-1 || t.flags.indexOf('SEND_NOW')>-1) counts.client++;
+      if(t.flags.indexOf('WIN')>-1) counts.wins++;
+      if(t.flags.indexOf('INCOMPLETE')>-1) counts.incomplete++;
+      if(t.flags.indexOf('SLA_BREACH')>-1) counts.sla++;
+    });
+  });
+  var html = [
+    '<div class="stat-pill"><span class="stat-num num-white">'+counts.total+'</span><span class="stat-label">Total Active</span></div>',
+    '<div class="stat-pill"><span class="stat-num num-red">'+counts.esc+'</span><span class="stat-label">Escalations</span></div>',
+    '<div class="stat-pill"><span class="stat-num num-orange">'+counts.client+'</span><span class="stat-label">Client Waiting</span></div>',
+    '<div class="stat-pill"><span class="stat-num num-yellow">'+counts.sla+'</span><span class="stat-label">SLA Breach</span></div>',
+    '<div class="stat-pill"><span class="stat-num num-green">'+counts.wins+'</span><span class="stat-label">Wins Today</span></div>',
+    '<div class="stat-pill"><span class="stat-num num-blue">'+counts.incomplete+'</span><span class="stat-label">Incomplete</span></div>',
+  ];
+  document.getElementById('statsBar').innerHTML = html.join('');
+}
+
+function taskPriority(t) {
+  var f = t.flags;
+  if(f.indexOf('ESCALATION')>-1) return 0;
+  if(f.indexOf('CLIENT_WAITING')>-1||f.indexOf('SEND_NOW')>-1) return 1;
+  if(f.indexOf('DUE_TODAY')>-1||f.indexOf('OVERDUE_TODAY')>-1) return 2;
+  if(f.indexOf('DUE_TOMORROW')>-1) return 3;
+  if(f.indexOf('SLA_BREACH')>-1) return 4;
+  if(f.indexOf('JUST_UPDATED')>-1||f.indexOf('WIN')>-1) return 5;
+  return 9;
+}
+
+function buildMain(data) {
+  var html = '';
+  // Sort brands by worst task priority
+  var brands = data.brands.slice().sort(function(a,b){
+    var ap = Math.min.apply(null, a.tasks.map(taskPriority).concat([99]));
+    var bp = Math.min.apply(null, b.tasks.map(taskPriority).concat([99]));
+    return ap - bp;
+  });
+  brands.forEach(function(brand) {
+    var tasks = brand.tasks.slice().sort(function(a,b){ return taskPriority(a)-taskPriority(b); });
+    html += '<div class="brand-block" data-brand="'+encodeURIComponent(brand.name)+'">';
+    html += '<div class="brand-header" onclick="toggleBrand(this)">';
+    html += '<span class="brand-dot"></span>';
+    html += '<span class="brand-name">'+brand.name+'</span>';
+    html += '<span class="brand-count">'+tasks.length+' tasks</span>';
+    html += '<span class="brand-chevron open">▶</span>';
+    html += '</div>';
+    html += '<table class="tasks-table" data-table>';
+    html += '<thead><tr>';
+    html += '<th style="width:28%">Task</th>';
+    html += '<th style="width:14%">Status</th>';
+    html += '<th style="width:18%">Flags</th>';
+    html += '<th style="width:10%">Due</th>';
+    html += '<th style="width:10%">Assignee</th>';
+    html += '<th style="width:20%">Last Activity / Draft</th>';
+    html += '</tr></thead><tbody>';
+    tasks.forEach(function(t) {
+      var flagChips = t.flags.map(chipHtml).join('');
+      var dueText = t.due || 'no due';
+      var dc = dueClass(dueText);
+      var lastCol = '';
+      if (t.reply_draft) {
+        lastCol = '<div class="reply-draft" title="'+t.reply_draft.replace(/"/g,'&quot;')+'" onclick="copyDraft(this)">📋 '+t.reply_draft.substring(0,60)+'...</div>';
+      } else if (t.last_comment) {
+        lastCol = '<div class="last-comment" title="'+t.last_comment.replace(/"/g,'&quot;')+'">'+t.last_comment.substring(0,60)+'</div>';
+      }
+      var rowFlags = t.flags.join(' ');
+      html += '<tr data-flags="'+rowFlags+'" data-brand="'+brand.name.toLowerCase()+'" data-text="'+t.name.toLowerCase()+' '+t.status.toLowerCase()+'">';
+      html += '<td class="task-name"><a href="https://app.clickup.com/t/'+t.id+'" target="_blank">'+t.name+'</a></td>';
+      html += '<td><span class="status-pill">'+t.status+'</span></td>';
+      html += '<td><div class="flag-chips">'+flagChips+'</div></td>';
+      html += '<td class="'+dc+'">'+dueText+'</td>';
+      html += '<td class="assignee-tag">'+(t.assignee||'—')+'</td>';
+      html += '<td>'+lastCol+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  });
+  if (!html) html = '<div class="empty-state">No tasks surfaced. All clear! 🎉</div>';
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function toggleBrand(header) {
+  var chevron = header.querySelector('.brand-chevron');
+  var table = header.nextElementSibling;
+  if (table.hasAttribute('data-hidden')) {
+    table.removeAttribute('data-hidden');
+    chevron.classList.add('open');
+  } else {
+    table.setAttribute('data-hidden','');
+    chevron.classList.remove('open');
+  }
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  var search = document.getElementById('searchBox').value.toLowerCase();
+  document.querySelectorAll('tr[data-flags]').forEach(function(row) {
+    var flags = row.getAttribute('data-flags');
+    var text = row.getAttribute('data-text') + ' ' + row.getAttribute('data-brand');
+    var matchFilter = activeFilter === 'ALL' || flags.indexOf(activeFilter) > -1;
+    var matchSearch = !search || text.indexOf(search) > -1;
+    if (matchFilter && matchSearch) {
+      row.removeAttribute('data-hidden');
+    } else {
+      row.setAttribute('data-hidden','');
+    }
+  });
+  // hide brand blocks if all rows hidden
+  document.querySelectorAll('.brand-block').forEach(function(block) {
+    var visible = block.querySelectorAll('tr[data-flags]:not([data-hidden])').length;
+    if (visible === 0) {
+      block.setAttribute('data-hidden','');
+    } else {
+      block.removeAttribute('data-hidden');
+    }
+  });
+}
+
+function copyDraft(el) {
+  var text = el.getAttribute('title');
+  navigator.clipboard.writeText(text).then(function(){
+    el.style.color = '#4ade80';
+    setTimeout(function(){ el.style.color = ''; }, 1200);
+  });
+}
+
+// Boot
+buildStats(REPORT_DATA);
+buildMain(REPORT_DATA);
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+name: WorkinX Morning Brief — Kavitha
+
+on:
+  schedule:
+    - cron: '0 5 * * 1-5'   # 10:30 AM IST = 05:00 UTC, Mon-Fri
+  workflow_dispatch:          # allow manual trigger
+
+jobs:
+  morning-brief-kavitha:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Trigger Claude remote routine & get JSON
+        id: claude
+        run: |
+          # Trigger the CCR remote routine via Claude API
+          # The routine outputs compact JSON to stdout/artifact
+          # Routine ID: trig_01XE5ZfSGzAsJSMPFtBUQok4
+          curl -s -X POST "https://api.anthropic.com/v1/routines/trig_01XE5ZfSGzAsJSMPFtBUQok4/run" \
+            -H "x-api-key: ${{ secrets.ANTHROPIC_API_KEY }}" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "Content-Type: application/json" \
+            -d '{}' | tee /tmp/routine_response.json
+          # Extract JSON output written by Claude to the output file
+          # Claude writes its JSON to kavitha_morning.json as part of the prompt
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Wait for routine to complete and fetch output
+        run: |
+          sleep 60  # allow CCR time to run
+          # In practice: poll for completion or use webhook callback
+          # For now: Claude writes JSON to a known path in the repo or outputs it
+          # The routine prompt writes JSON to /tmp/kavitha_morning.json via Bash tool
+
+      - name: Render HTML from JSON
+        run: |
+          python3 workinx-pm/render.py /tmp/kavitha_morning.json /tmp/kavitha_morning_report.html
+
+      - name: Upload HTML to Slack
+        run: |
+          bash workinx-pm/upload_slack.sh \
+            /tmp/kavitha_morning_report.html \
+            "${{ secrets.SLACK_KAVITHA_CHANNEL }}" \
+            "🌅 Morning Brief — Kavitha | $(date +'%d %b %Y')"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
