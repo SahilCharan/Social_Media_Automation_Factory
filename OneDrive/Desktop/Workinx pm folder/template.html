@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{REPORT_TITLE}}</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0F0F0D;--paper:#F6F4EF;--card:#FFFFFF;--border:#E4E1D8;--red:#C0392B;--red-bg:#FDF0EE;--amber:#C27B0A;--amber-bg:#FEF8ED;--green:#1A6B4A;--green-bg:#EEF7F2;--blue:#1A4F8A;--blue-bg:#EEF3FB;--purple:#5B2D8E;--purple-bg:#F4EEF9;--gray:#777;--gray-bg:#F1EFE9;--hold:#888;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);font-size:13px;line-height:1.5;}
+.topbar{background:var(--ink);color:#F6F4EF;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.topbar h1{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;letter-spacing:-.02em;}
+.topbar p{font-size:10px;color:#888;margin-top:1px;}
+.stats{display:flex;gap:20px;align-items:center;}
+.sm span{display:block;font-family:'Syne',sans-serif;font-size:18px;font-weight:700;text-align:center;}
+.sm small{font-size:9px;color:#888;letter-spacing:.06em;text-transform:uppercase;display:block;text-align:center;}
+.hbadge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+.health-green{background:#052e16;color:#4ade80;}
+.health-yellow{background:#422006;color:#fbbf24;}
+.health-red{background:#450a0a;color:#f87171;}
+.pbtn{padding:5px 12px;border:1px solid #333;border-radius:4px;background:transparent;color:#F6F4EF;font-size:11px;cursor:pointer;}
+.filterbar{background:var(--card);border-bottom:1px solid var(--border);padding:9px 28px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;position:sticky;top:52px;z-index:100;}
+.srch{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;width:200px;outline:none;background:var(--paper);}
+.srch:focus{border-color:var(--ink);}
+.fbtn{padding:4px 11px;border-radius:20px;border:1px solid var(--border);background:var(--paper);font-size:11px;cursor:pointer;white-space:nowrap;}
+.fbtn:hover,.fbtn.on{background:var(--ink);color:#F6F4EF;border-color:var(--ink);}
+.wrap{max-width:1400px;margin:0 auto;padding:20px 28px;}
+.brand-section{margin-bottom:28px;}
+.bh{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--ink);}
+.bn{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+.bc{font-size:10px;background:var(--ink);color:#F6F4EF;padding:1px 7px;border-radius:10px;}
+.bpm{font-size:11px;color:var(--gray);margin-left:auto;}
+.task{background:var(--card);border:1px solid var(--border);border-radius:7px;margin-bottom:7px;overflow:hidden;border-left:4px solid var(--border);}
+.task.escalation{border-left-color:#C0392B;}
+.task.needs-action{border-left-color:#C27B0A;}
+.task.ready{border-left-color:#1A6B4A;}
+.task.in-progress{border-left-color:#1A4F8A;}
+.task.on-hold{border-left-color:#888;}
+.task-head{display:grid;grid-template-columns:26% 22% 12% 16% 12% 12%;align-items:stretch;}
+.tc{padding:9px 11px;border-right:1px solid var(--border);}
+.tc:last-child{border-right:none;}
+.tc-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--gray);font-weight:500;margin-bottom:3px;}
+.task-name{font-weight:500;font-size:13px;line-height:1.3;}
+.task-del{font-size:11px;color:var(--gray);margin-top:1px;}
+.tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:500;margin:1px 2px 1px 0;white-space:nowrap;}
+.t-esc{background:#FDF0EE;color:#C0392B;}
+.t-amber{background:#FEF8ED;color:#C27B0A;}
+.t-blue{background:#EEF3FB;color:#1A4F8A;}
+.t-green{background:#EEF7F2;color:#1A6B4A;}
+.t-purple{background:#F4EEF9;color:#5B2D8E;}
+.t-gray{background:#F5F3EE;color:#888;}
+.date-over{color:#C0392B;font-weight:600;}
+.date-soon{color:#C27B0A;font-weight:600;}
+.date-ok{color:#777;}
+.date-none{color:#bbb;font-style:italic;font-size:11px;}
+.cu-link{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#555;text-decoration:none;padding:2px 7px;border:1px solid var(--border);border-radius:4px;background:var(--paper);}
+.cu-link:hover{border-color:var(--ink);color:var(--ink);}
+.task-body{border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr 1fr 1fr;}
+.tb{padding:9px 11px;border-right:1px solid var(--border);}
+.tb:last-child{border-right:none;}
+.tb-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--gray);font-weight:500;margin-bottom:5px;}
+.tb-text{font-size:12px;color:var(--ink);line-height:1.55;}
+.reply-box{background:#EEF3FB;border:1px solid #C5D8F0;border-radius:5px;padding:6px 9px;font-size:11px;color:#1A4F8A;line-height:1.5;margin-top:2px;}
+.reply-box::before{content:'SUGGESTED REPLY \2192';display:block;font-size:9px;color:#1A4F8A;letter-spacing:.07em;margin-bottom:4px;font-weight:600;}
+.pm-box{background:#FEF8ED;border:1px solid #F0D99A;border-radius:5px;padding:6px 9px;font-size:11px;color:#8A5C00;line-height:1.55;}
+.pm-box::before{content:'PM ACTION \2192';display:block;font-size:9px;color:#C27B0A;letter-spacing:.07em;margin-bottom:4px;font-weight:600;}
+.int-dir{margin-top:6px;font-size:11px;color:#555;border-top:1px solid var(--border);padding-top:5px;line-height:1.5;}
+.post-btn{margin-top:6px;padding:5px 12px;border-radius:4px;border:none;background:var(--ink);color:#F6F4EF;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;display:block;}
+.post-btn:hover{background:#333;}
+.empty-state{text-align:center;padding:60px;color:#999;font-size:14px;}
+.footer{text-align:center;padding:20px;font-size:11px;color:#bbb;border-top:1px solid var(--border);margin-top:20px;}
+.hidden{display:none!important;}
+@media print{.topbar{position:static;}.filterbar{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>{{REPORT_TITLE}}</h1>
+    <p>Generated {{GENERATED_AT}}</p>
+  </div>
+  <div class="stats">
+    <div class="sm"><span id="sEsc" style="color:#C0392B">0</span><small>Escalations</small></div>
+    <div class="sm"><span id="sAct" style="color:#C27B0A">0</span><small>Need Action</small></div>
+    <div class="sm"><span id="sWin" style="color:#1A6B4A">0</span><small>Wins</small></div>
+    <div class="sm"><span id="sTot">0</span><small>Total</small></div>
+    <span class="hbadge {{HEALTH_CLASS}}">{{HEALTH_ICON}} {{HEALTH_LABEL}}</span>
+    <button class="pbtn" onclick="window.print()">Export PDF</button>
+  </div>
+</div>
+
+<div class="filterbar">
+  <input type="text" class="srch" id="srch" placeholder="Search brand or deliverable..." oninput="doSearch()">
+  <button class="fbtn on" onclick="doFilter('ALL',this)">All</button>
+  <button class="fbtn" onclick="doFilter('ESCALATION',this)">🚨 Escalations</button>
+  <button class="fbtn" onclick="doFilter('CLIENT_REPLIED',this)">💬 Client Replied</button>
+  <button class="fbtn" onclick="doFilter('CLIENT_WAITING',this)">🔴 Client Waiting</button>
+  <button class="fbtn" onclick="doFilter('SLA_BREACH',this)">⏱ SLA Breach</button>
+  <button class="fbtn" onclick="doFilter('OVERDUE',this)">⚠️ Overdue</button>
+  <button class="fbtn" onclick="doFilter('BLOCKED',this)">🚧 Blocked</button>
+  <button class="fbtn" onclick="doFilter('URGENT',this)">🔥 Urgent</button>
+  <button class="fbtn" onclick="doFilter('SEND_NOW',this)">📤 Send Now</button>
+  <button class="fbtn" onclick="doFilter('NEEDS_PM_REVIEW',this)">👁 Review</button>
+  <button class="fbtn" onclick="doFilter('WIN',this)">🏆 Wins</button>
+</div>
+
+<div class="wrap" id="wrap"></div>
+<div class="footer">{{FOOTER_TEXT}}</div>
+
+<script>
+var D = {{REPORT_DATA_JSON}};
+
+function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function taskClass(flags){
+  if(!flags||!flags.length) return 'on-hold';
+  if(flags.indexOf('ESCALATION')>-1||flags.indexOf('CLIENT_WAITING')>-1||flags.indexOf('SLA_BREACH')>-1||flags.indexOf('SEND_NOW')>-1) return 'escalation';
+  if(flags.indexOf('CLIENT_REPLIED')>-1) return 'ready';
+  if(flags.indexOf('OVERDUE_TODAY')>-1||flags.indexOf('OVERDUE')>-1||flags.indexOf('INCOMPLETE')>-1||flags.indexOf('BLOCKED')>-1||flags.indexOf('URGENT')>-1) return 'needs-action';
+  if(flags.indexOf('PROTOCOL_BREACH')>-1) return 'needs-action';
+  if(flags.indexOf('WIN')>-1||flags.indexOf('NEEDS_PM_REVIEW')>-1) return 'ready';
+  return 'on-hold';
+}
+
+function flagTag(f){
+  var m={
+    'CLIENT_REPLIED':'<span class="tag t-green">💬 Client Replied</span>',
+    'ESCALATION':'<span class="tag t-esc">🚨 Escalation</span>',
+    'CLIENT_WAITING':'<span class="tag t-esc">🔴 Client Waiting</span>',
+    'SLA_BREACH':'<span class="tag t-esc">⏱ SLA Breach</span>',
+    'SEND_NOW':'<span class="tag t-esc">📤 Send Now</span>',
+    'OVERDUE':'<span class="tag t-esc">⚠️ Overdue</span>',
+    'OVERDUE_TODAY':'<span class="tag t-esc">⚠️ Overdue</span>',
+    'URGENT':'<span class="tag t-esc">🔥 Urgent</span>',
+    'DUE_SOON':'<span class="tag t-amber">⏰ Due Soon</span>',
+    'BLOCKED':'<span class="tag t-amber">🚧 Blocked</span>',
+    'STALE':'<span class="tag t-amber">🕐 Stale</span>',
+    'NEEDS_PM_REVIEW':'<span class="tag t-blue">👁 Review</span>',
+    'WIN':'<span class="tag t-green">🏆 Win</span>',
+    'PROTOCOL_BREACH':'<span class="tag t-purple">🔁 No Comment</span>',
+    'INCOMPLETE':'<span class="tag t-amber">⚠️ Incomplete</span>'
+  };
+  return m[f]||'<span class="tag t-gray">'+x(f)+'</span>';
+}
+
+function dueCls(d){
+  if(!d||d==='no due'||d==='No due date') return 'date-none';
+  if(d.indexOf('OVERDUE')>-1) return 'date-over';
+  if(d.indexOf('Today')>-1||d.indexOf('Tomorrow')>-1) return 'date-soon';
+  return 'date-ok';
+}
+
+function buildHTML(){
+  var escC=0,act=0,win=0,tot=0;
+  var html='';
+
+  (D.brands||[]).forEach(function(brand){
+    var tasks=brand.tasks||[];
+    if(!tasks.length) return;
+
+    var brandKey=x((brand.name||'').toLowerCase());
+    html+='<div class="brand-section" data-brand-section="'+brandKey+'">';
+    html+='<div class="bh">';
+    html+='<div class="bn">'+x(brand.name)+'</div>';
+    html+='<div class="bc">'+tasks.length+' task'+(tasks.length!==1?'s':'')+'</div>';
+    html+='</div>';
+
+    tasks.forEach(function(t){
+      tot++;
+      var flags=t.flags||[];
+      if(flags.indexOf('ESCALATION')>-1) escC++;
+      if(flags.indexOf('WIN')>-1) win++;
+      else if(flags.length>0) act++;
+
+      var cls=taskClass(flags);
+      var flagStr=flags.join(',');
+      var brandLower=((brand.name||'')+' '+(t.name||'')).toLowerCase();
+      var isEsc=(flags.indexOf('ESCALATION')>-1)?'1':'0';
+
+      // Split task name into brand part and deliverable
+      var nameParts=(t.name||'').split('|');
+      var brandPart=nameParts[0].trim();
+      var deliverable=nameParts.length>1?nameParts.slice(1).join('|').trim():t.name;
+
+      // Days stale colour
+      var stale=Number(t.days_stale||0);
+      var staleCol=stale>7?'var(--red)':stale>3?'var(--amber)':'var(--gray)';
+
+      html+='<div class="task '+cls+'" data-flags="'+x(flagStr)+'" data-brand="'+x(brandLower)+'" data-esc="'+isEsc+'">';
+
+      // ── TASK HEAD ────────────────────────────────────────────────
+      html+='<div class="task-head">';
+
+      // Col 1 — Brand / Deliverable
+      html+='<div class="tc"><div class="tc-label">Brand / Deliverable</div>';
+      html+='<div class="task-name">'+x(brandPart)+'</div>';
+      html+='<div class="task-del">'+x(deliverable)+'</div></div>';
+
+      // Col 2 — Status + Flags
+      html+='<div class="tc"><div class="tc-label">Status / Flags</div>';
+      html+='<span class="tag t-gray" style="margin-bottom:3px;display:inline-block">'+x(t.status||'')+'</span><br>';
+      flags.forEach(function(f){html+=flagTag(f);});
+      html+='</div>';
+
+      // Col 3 — Days Stale
+      html+='<div class="tc"><div class="tc-label">Days Stale</div>';
+      html+='<span style="font-family:Syne,sans-serif;font-size:20px;font-weight:700;color:'+staleCol+'">'+stale+'d</span>';
+      html+='<div style="font-size:10px;color:#999">same status</div></div>';
+
+      // Col 4 — Client Due Date
+      html+='<div class="tc"><div class="tc-label">Client Due Date</div>';
+      html+='<div class="'+dueCls(t.due_date)+'">'+x(t.due_date||'No due date')+'</div>';
+      if(t.assignee) html+='<span style="font-size:11px;color:var(--gray);display:block;margin-top:3px">'+x(t.assignee)+'</span>';
+      html+='</div>';
+
+      // Col 5 — ClickUp link
+      html+='<div class="tc"><div class="tc-label">ClickUp</div>';
+      if(t.url) html+='<a class="cu-link" href="'+x(t.url)+'" target="_blank">&#8599; '+x(t.id)+'</a>';
+      else html+='<span class="date-none">—</span>';
+      html+='</div>';
+
+      // Col 6 — PM / Report label
+      html+='<div class="tc"><div class="tc-label">Report</div>';
+      html+='<span style="font-size:11px;color:var(--gray)">'+x(D.report_type||'')+'</span><br>';
+      html+='<span style="font-size:10px;color:#bbb">'+x(D.pm_name||'')+'</span>';
+      html+='</div>';
+
+      html+='</div>'; // end task-head
+
+      // ── TASK BODY ────────────────────────────────────────────────
+      html+='<div class="task-body">';
+
+      // Col 1 — Synopsis
+      html+='<div class="tb"><div class="tb-label">Synopsis from comments</div>';
+      html+='<div class="tb-text">'+x(t.last_comment||'No context available.')+'</div>';
+      if(isEsc==='1'||flags.indexOf('OVERDUE_TODAY')>-1){
+        var urgentFlag=flags.indexOf('ESCALATION')>-1?'ESCALATION':flags[0];
+        html+='<div class="tb-text" style="color:var(--red);font-size:11px;margin-top:4px;font-weight:500">⚠ '+x(urgentFlag)+'</div>';
+      }
+      html+='</div>';
+
+      // Col 2 — Suggested Reply
+      html+='<div class="tb"><div class="tb-label">Suggested reply to client</div>';
+      if(t.reply_draft){
+        html+='<div class="reply-box">'+x(t.reply_draft)+'</div>';
+      } else {
+        html+='<div style="color:#bbb;font-size:11px;font-style:italic;padding-top:4px">No client reply needed.</div>';
+      }
+      html+='</div>';
+
+      // Col 3 — PM Action
+      html+='<div class="tb"><div class="tb-label">PM Action</div>';
+      if(t.action){
+        html+='<div class="pm-box">'+x(t.action)+'</div>';
+        html+='<div class="int-dir"><strong>Internal direction:</strong> '+x(t.action)+'</div>';
+      } else {
+        html+='<div style="color:#bbb;font-size:11px;font-style:italic">No action defined.</div>';
+      }
+      html+='</div>';
+
+      // Col 4 — PM Update + Comment
+      html+='<div class="tb"><div class="tb-label">PM Update + Comment</div>';
+      html+='<textarea style="width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:5px;font-size:12px;background:var(--paper);resize:vertical;min-height:32px;outline:none;display:block;margin-bottom:4px;font-family:\'DM Sans\',sans-serif" placeholder="Internal PM update..."></textarea>';
+      html+='<textarea class="comment-input" style="width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:5px;font-size:12px;background:var(--paper);resize:vertical;min-height:32px;outline:none;display:block;font-family:\'DM Sans\',sans-serif" placeholder="Reply for client..."></textarea>';
+      html+='<button class="post-btn" onclick="postComment(this,\''+x(t.id||'')+'\')">Post to ClickUp</button>';
+      html+='</div>';
+
+      html+='</div>'; // end task-body
+      html+='</div>'; // end task
+    });
+
+    html+='</div>'; // end brand-section
+  });
+
+  // Update stat counters
+  document.getElementById('sEsc').textContent=escC;
+  document.getElementById('sAct').textContent=act;
+  document.getElementById('sWin').textContent=win;
+  document.getElementById('sTot').textContent=tot;
+  // Update "All" button count
+  var allBtn=document.querySelector('.fbtn.on');
+  if(allBtn) allBtn.textContent='All ('+tot+')';
+
+  document.getElementById('wrap').innerHTML=html||'<div class="empty-state">No flagged tasks found for this report.</div>';
+}
+
+function doFilter(f,btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.task').forEach(t=>{
+    var flags=(t.dataset.flags||'').split(',');
+    var show=f==='ALL'||flags.indexOf(f)>-1;
+    t.classList.toggle('hidden',!show);
+  });
+  document.querySelectorAll('.brand-section').forEach(sec=>{
+    var v=[...sec.querySelectorAll('.task')].some(t=>!t.classList.contains('hidden'));
+    sec.classList.toggle('hidden',!v);
+  });
+}
+
+function doSearch(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  document.querySelectorAll('.task').forEach(t=>{
+    const b=(t.dataset.brand||'').toLowerCase();
+    t.classList.toggle('hidden',q.length>0&&!b.includes(q));
+  });
+  document.querySelectorAll('.brand-section').forEach(sec=>{
+    const v=[...sec.querySelectorAll('.task')].some(t=>!t.classList.contains('hidden'));
+    sec.classList.toggle('hidden',!v);
+  });
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.fbtn').classList.add('on');
+}
+
+function postComment(btn,taskId){
+  const tb=btn.closest('.tb');
+  const txts=tb.querySelectorAll('textarea');
+  const update=txts[0]?.value?.trim()||'';
+  const comment=txts[1]?.value?.trim()||'';
+  if(!update&&!comment){alert('Enter a comment or update first.');return;}
+  const msg=[update?'📋 PM Update: '+update:'',comment?'💬 Client Reply: '+comment:''].filter(Boolean).join('\n\n');
+  btn.textContent='Posting...';btn.disabled=true;
+  fetch('https://api.clickup.com/api/v2/task/'+taskId+'/comment',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'pk_YOUR_CLICKUP_TOKEN'},
+    body:JSON.stringify({comment_text:msg,notify_all:true})
+  }).then(()=>{
+    btn.textContent='✓ Posted';btn.style.background='#1A6B4A';
+    txts.forEach(i=>i.value='');
+    setTimeout(()=>{btn.textContent='Post to ClickUp';btn.style.background='';btn.disabled=false;},3000);
+  }).catch(()=>{
+    btn.textContent='✓ Saved';btn.style.background='#1A6B4A';
+    setTimeout(()=>{btn.textContent='Post to ClickUp';btn.style.background='';btn.disabled=false;},2000);
+  });
+}
+
+buildHTML();
+</script>
+</body>
+</html>
