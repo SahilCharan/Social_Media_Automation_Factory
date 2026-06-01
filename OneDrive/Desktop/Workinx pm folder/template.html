@@ -232,9 +232,9 @@ function buildHTML(){
       // ── TASK BODY ────────────────────────────────────────────────
       html+='<div class="task-body">';
 
-      // Col 1 — Synopsis
-      html+='<div class="tb"><div class="tb-label">Synopsis from comments</div>';
-      html+='<div class="tb-text">'+x(t.last_comment||'No context available.')+'</div>';
+      // Col 1 — Last Comment
+      html+='<div class="tb"><div class="tb-label">Last Client Comment</div>';
+      html+='<div class="tb-text">'+x(t.last_comment||'No comment available.')+'</div>';
       if(isEsc==='1'||flags.indexOf('OVERDUE_TODAY')>-1){
         var urgentFlag=flags.indexOf('ESCALATION')>-1?'ESCALATION':flags[0];
         html+='<div class="tb-text" style="color:var(--red);font-size:11px;margin-top:4px;font-weight:500">⚠ '+x(urgentFlag)+'</div>';
