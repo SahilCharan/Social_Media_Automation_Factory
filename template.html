@@ -208,9 +208,10 @@ function buildHTML(){
       if(t.assignee) html+='<span style="font-size:11px;color:var(--gray);display:block;margin-top:3px">'+x(t.assignee)+'</span>';
       html+='</div>';
 
-      // Col 5 — ClickUp link
+      // Col 5 — ClickUp link (derive from id if url not provided — ClickUp task URLs are deterministic)
       html+='<div class="tc"><div class="tc-label">ClickUp</div>';
-      if(t.url) html+='<a class="cu-link" href="'+x(t.url)+'" target="_blank">&#8599; '+x(t.id)+'</a>';
+      var cuUrl = t.url || (t.id ? 'https://app.clickup.com/t/'+encodeURIComponent(t.id) : '');
+      if(cuUrl) html+='<a class="cu-link" href="'+x(cuUrl)+'" target="_blank">&#8599; '+x(t.id||'')+'</a>';
       else html+='<span class="date-none">—</span>';
       html+='</div>';
 
