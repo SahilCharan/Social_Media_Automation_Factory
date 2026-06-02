@@ -10,22 +10,37 @@
       "tasks": [
         {
           "id": "abc123xyz",
-          "name": "NZ Honey Co — Social Media Pack May",
+          "name": "NZ Honey Co | Social Media Pack May",
           "status": "sent for approval",
           "due": "Today",
           "assignee": "Anuvrath",
-          "flags": ["SEND_NOW", "OVERDUE_TODAY"],
+          "flags": ["SEND_NOW", "CLIENT_FEEDBACK_PENDING", "OVERDUE"],
           "last_comment": "Tiz (client, 2h ago): Any update on the pack?",
-          "reply_draft": "Hi Tiz — we're finalising the May pack now and will share it with you by 3pm today. Sorry for the delay."
+          "client_comments": [
+            {
+              "author": "Tiz",
+              "hours_ago": 2,
+              "text": "Any update on the May social pack? Need to brief the founder by Friday — also can you double-check the captions on posts 3 and 4, they read a bit corporate.",
+              "unactioned": true
+            },
+            {
+              "author": "Tiz",
+              "hours_ago": 26,
+              "text": "Looks good on visuals overall. Two requests: (1) swap the hero image on post 1 for the new bottle render, (2) shorten the CTA on the carousel to under 6 words.",
+              "unactioned": false
+            }
+          ],
+          "reply_draft": "Hi Tiz — finalising the May pack today. We'll send the v2 with the new bottle render and shortened CTAs by 3 pm IST, and tone the post 3 & 4 captions to be warmer. You'll have it before Friday."
         },
         {
           "id": "def456uvw",
-          "name": "Mark J — Blog Post June",
+          "name": "Mark J | Blog Post June",
           "status": "changes done",
           "due": "Tomorrow",
           "assignee": "Dhruv",
-          "flags": ["NEEDS_PM_REVIEW", "DUE_TOMORROW"],
+          "flags": ["NEEDS_PM_REVIEW", "DUE_SOON"],
           "last_comment": "Dhruv: Changes done, ready for review",
+          "client_comments": [],
           "reply_draft": null
         }
       ]
@@ -35,13 +50,21 @@
       "tasks": [
         {
           "id": "ghi789rst",
-          "name": "Brand B — Instagram Reels Q2",
-          "status": "under client review",
+          "name": "Brand B | Instagram Reels Q2",
+          "status": "design ready",
           "due": "28 May 2026",
           "assignee": "Mansi",
-          "flags": ["CLIENT_REPLY_WAITING"],
-          "last_comment": "PM: Sent for review 4 days ago",
-          "reply_draft": null
+          "flags": ["CLIENT_WAITING", "STATUS_MISMATCH"],
+          "last_comment": "Sarah (client, 36h ago): Can we add a B-roll cut at 0:12…",
+          "client_comments": [
+            {
+              "author": "Sarah",
+              "hours_ago": 36,
+              "text": "Can we add a B-roll cut at 0:12 of the storefront from yesterday's shoot? Also the lower-third font feels off — please use Syne Bold like we agreed in the brand kit.",
+              "unactioned": true
+            }
+          ],
+          "reply_draft": "Hi Sarah — good catches. We'll splice the storefront B-roll into 0:12–0:14 and swap the lower-third to Syne Bold. Updated cut will be in your inbox by tomorrow EOD IST."
         }
       ]
     }

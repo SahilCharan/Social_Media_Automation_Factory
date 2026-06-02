@@ -71,6 +71,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);f
 .empty-state{text-align:center;padding:60px;color:#999;font-size:14px;}
 .footer{text-align:center;padding:20px;font-size:11px;color:#bbb;border-top:1px solid var(--border);margin-top:20px;}
 .hidden{display:none!important;}
+/* ── Client comment thread (verbatim quotes) ──────────────────────────── */
+.client-thread{background:#FAF8F2;border-top:1px solid var(--border);padding:8px 14px 10px;}
+.client-thread-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.client-thread-label .ct-count{background:var(--ink);color:#F6F4EF;padding:0 6px;border-radius:8px;font-size:9px;}
+.client-quote{background:var(--card);border-left:3px solid #1A4F8A;border-radius:0 5px 5px 0;padding:7px 10px;margin-bottom:6px;font-size:12px;line-height:1.5;color:var(--ink);}
+.client-quote.unactioned{border-left-color:var(--red);background:#FDF6F4;}
+.cq-meta{font-size:10px;color:var(--gray);margin-bottom:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cq-author{font-weight:600;color:var(--ink);}
+.cq-age{color:var(--gray);}
+.cq-unact{background:var(--red);color:#fff;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;letter-spacing:.05em;}
+.cq-text{white-space:pre-wrap;word-break:break-word;}
+.client-thread-empty{font-size:11px;color:#bbb;font-style:italic;}
 @media print{.topbar{position:static;}.filterbar{display:none;}}
 </style>
 </head>
@@ -95,12 +107,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);f
   <input type="text" class="srch" id="srch" placeholder="Search brand or deliverable..." oninput="doSearch()">
   <button class="fbtn on" onclick="doFilter('ALL',this)">All</button>
   <button class="fbtn" onclick="doFilter('ESCALATION',this)">🚨 Escalations</button>
+  <button class="fbtn" onclick="doFilter('CLIENT_FEEDBACK_PENDING',this)">💬 Client Feedback Pending</button>
   <button class="fbtn" onclick="doFilter('CLIENT_WAITING',this)">🔴 Client Waiting</button>
+  <button class="fbtn" onclick="doFilter('STATUS_MISMATCH',this)">🔁 Status Mismatch</button>
   <button class="fbtn" onclick="doFilter('SEND_NOW',this)">📤 Send Now</button>
-  <button class="fbtn" onclick="doFilter('OVERDUE_TODAY',this)">⚠️ Overdue</button>
+  <button class="fbtn" onclick="doFilter('OVERDUE',this)">⚠️ Overdue</button>
   <button class="fbtn" onclick="doFilter('BLOCKED',this)">🚧 Blocked</button>
   <button class="fbtn" onclick="doFilter('NEEDS_PM_REVIEW',this)">👁 Review</button>
   <button class="fbtn" onclick="doFilter('SLA_BREACH',this)">⏱ SLA</button>
+  <button class="fbtn" onclick="doFilter('URGENT',this)">⚡ Urgent</button>
   <button class="fbtn" onclick="doFilter('WIN',this)">🏆 Wins</button>
 </div>
 
@@ -114,8 +129,8 @@ function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 
 function taskClass(flags){
   if(!flags||!flags.length) return 'on-hold';
-  if(flags.indexOf('ESCALATION')>-1||flags.indexOf('CLIENT_WAITING')>-1||flags.indexOf('SEND_NOW')>-1) return 'escalation';
-  if(flags.indexOf('OVERDUE_TODAY')>-1||flags.indexOf('SLA_BREACH')>-1||flags.indexOf('INCOMPLETE')>-1||flags.indexOf('BLOCKED')>-1) return 'needs-action';
+  if(flags.indexOf('ESCALATION')>-1||flags.indexOf('CLIENT_WAITING')>-1||flags.indexOf('CLIENT_FEEDBACK_PENDING')>-1||flags.indexOf('SEND_NOW')>-1||flags.indexOf('URGENT')>-1) return 'escalation';
+  if(flags.indexOf('OVERDUE')>-1||flags.indexOf('OVERDUE_TODAY')>-1||flags.indexOf('SLA_BREACH')>-1||flags.indexOf('INCOMPLETE')>-1||flags.indexOf('BLOCKED')>-1||flags.indexOf('STATUS_MISMATCH')>-1) return 'needs-action';
   if(flags.indexOf('PROTOCOL_BREACH')>-1) return 'needs-action';
   if(flags.indexOf('WIN')>-1||flags.indexOf('NEEDS_PM_REVIEW')>-1) return 'ready';
   return 'on-hold';
@@ -125,14 +140,19 @@ function flagTag(f){
   var m={
     'ESCALATION':'<span class="tag t-esc">🚨 Escalation</span>',
     'CLIENT_WAITING':'<span class="tag t-esc">🔴 Client Waiting</span>',
+    'CLIENT_FEEDBACK_PENDING':'<span class="tag t-esc">💬 Client Feedback Pending</span>',
+    'STATUS_MISMATCH':'<span class="tag t-purple">🔁 Status Mismatch</span>',
     'SEND_NOW':'<span class="tag t-esc">📤 Send Now</span>',
+    'OVERDUE':'<span class="tag t-amber">⚠️ Overdue</span>',
     'OVERDUE_TODAY':'<span class="tag t-amber">⚠️ Overdue</span>',
     'DUE_SOON':'<span class="tag t-amber">⏰ Due Soon</span>',
     'BLOCKED':'<span class="tag t-amber">🚧 Blocked</span>',
     'NEEDS_PM_REVIEW':'<span class="tag t-blue">👁 Review</span>',
     'SLA_BREACH':'<span class="tag t-amber">⏱ SLA Breach</span>',
+    'STALE':'<span class="tag t-gray">🕒 Stale</span>',
+    'URGENT':'<span class="tag t-esc">⚡ Urgent</span>',
     'WIN':'<span class="tag t-green">🏆 Win</span>',
-    'PROTOCOL_BREACH':'<span class="tag t-purple">🔁 No Comment</span>',
+    'PROTOCOL_BREACH':'<span class="tag t-purple">🔁 No PM Comment</span>',
     'INCOMPLETE':'<span class="tag t-amber">⚠️ Incomplete</span>'
   };
   return m[f]||'<span class="tag t-gray">'+x(f)+'</span>';
@@ -208,9 +228,10 @@ function buildHTML(){
       if(t.assignee) html+='<span style="font-size:11px;color:var(--gray);display:block;margin-top:3px">'+x(t.assignee)+'</span>';
       html+='</div>';
 
-      // Col 5 — ClickUp link
+      // Col 5 — ClickUp link (derive from id if url not provided — ClickUp task URLs are deterministic)
       html+='<div class="tc"><div class="tc-label">ClickUp</div>';
-      if(t.url) html+='<a class="cu-link" href="'+x(t.url)+'" target="_blank">&#8599; '+x(t.id)+'</a>';
+      var cuUrl = t.url || (t.id ? 'https://app.clickup.com/t/'+encodeURIComponent(t.id) : '');
+      if(cuUrl) html+='<a class="cu-link" href="'+x(cuUrl)+'" target="_blank">&#8599; '+x(t.id||'')+'</a>';
       else html+='<span class="date-none">—</span>';
       html+='</div>';
 
@@ -261,6 +282,36 @@ function buildHTML(){
       html+='</div>';
 
       html+='</div>'; // end task-body
+
+      // ── CLIENT COMMENT THREAD (verbatim quotes — no truncation) ─────
+      var clientComments = Array.isArray(t.client_comments) ? t.client_comments : [];
+      if(clientComments.length){
+        var unactCount = clientComments.filter(function(c){return c && c.unactioned;}).length;
+        html+='<div class="client-thread">';
+        html+='<div class="client-thread-label">💬 Client said'+
+              '<span class="ct-count">'+clientComments.length+'</span>'+
+              (unactCount>0?'<span class="cq-unact" style="margin-left:4px">'+unactCount+' UNACTIONED</span>':'')+
+              '</div>';
+        clientComments.forEach(function(c){
+          if(!c) return;
+          var unact = c.unactioned ? ' unactioned' : '';
+          html+='<div class="client-quote'+unact+'">';
+          html+='<div class="cq-meta">';
+          html+='<span class="cq-author">'+x(c.author||'Client')+'</span>';
+          if(typeof c.hours_ago === 'number'){
+            var age = c.hours_ago < 1 ? '<1h ago'
+                    : c.hours_ago < 24 ? Math.round(c.hours_ago)+'h ago'
+                    : Math.round(c.hours_ago/24)+'d ago';
+            html+='<span class="cq-age">'+x(age)+'</span>';
+          }
+          if(c.unactioned) html+='<span class="cq-unact">⚠ NEEDS REPLY</span>';
+          html+='</div>';
+          html+='<div class="cq-text">'+x(c.text||'')+'</div>';
+          html+='</div>';
+        });
+        html+='</div>'; // end client-thread
+      }
+
       html+='</div>'; // end task
     });
 
