@@ -40,6 +40,17 @@ ENV/
 *.swo
 *~
 
+# WorkinX PM Intelligence — split into its own repo (workinx-pm-intelligence).
+# Keep it out of this Instagram/social-media project so the two never tangle.
+/OneDrive/Desktop/Workinx pm folder/
+/render.py
+/template.html
+/run.sh
+/upload_slack.sh
+/schema_example.json
+/routines/
+/.github/workflows/morning-kavitha.yml
+
 # OS
 .DS_Store
 .DS_Store?
