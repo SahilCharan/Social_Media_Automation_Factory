@@ -1,14 +1,32 @@
 name: WorkinX Morning Brief — Kavitha
 
+# This workflow is a MANUAL FALLBACK trigger for the Kavitha morning brief.
+#
+# The primary daily trigger lives in Claude Code on the web (visible in today's
+# 10:50 IST post from PMs Bot — this workflow's cron is 10:30 IST and would
+# have arrived earlier if it were the producer). The scheduled cron below is
+# therefore commented out to prevent double-posting. Re-enable only after
+# confirming the CCW routine is decommissioned.
+
 on:
-  schedule:
-    - cron: '0 5 * * 1-5'   # 10:30 AM IST = 05:00 UTC, Mon-Fri
-  workflow_dispatch:          # allow manual trigger
+  # schedule:
+  #   - cron: '0 5 * * 1-5'   # 10:30 AM IST = 05:00 UTC, Mon-Fri
+  workflow_dispatch:
 
 jobs:
   morning-brief-kavitha:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    env:
+      ANTHROPIC_API_KEY:     ${{ secrets.ANTHROPIC_API_KEY }}
+      SLACK_BOT_TOKEN:       ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_KAVITHA_CHANNEL: ${{ secrets.SLACK_KAVITHA_CHANNEL }}
+      ROUTINE_TRIGGER_ID:    trig_01XE5ZfSGzAsJSMPFtBUQok4
+      WORK_DIR:              /tmp/morning-brief
+      JSON_PATH:             /tmp/morning-brief/kavitha_morning.json
+      HTML_PATH:             /tmp/morning-brief/kavitha_morning_report.html
+      RAW_RESPONSE_PATH:     /tmp/morning-brief/routine_response.json
 
     steps:
       - name: Checkout repo
@@ -19,38 +37,103 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Trigger Claude remote routine & get JSON
-        id: claude
+      - name: Pre-flight — required secrets and scripts exist
         run: |
-          # Trigger the CCR remote routine via Claude API
-          # The routine outputs compact JSON to stdout/artifact
-          # Routine ID: trig_01XE5ZfSGzAsJSMPFtBUQok4
-          curl -s -X POST "https://api.anthropic.com/v1/routines/trig_01XE5ZfSGzAsJSMPFtBUQok4/run" \
-            -H "x-api-key: ${{ secrets.ANTHROPIC_API_KEY }}" \
+          set -euo pipefail
+          missing=()
+          [[ -n "${ANTHROPIC_API_KEY:-}" ]]      || missing+=("ANTHROPIC_API_KEY")
+          [[ -n "${SLACK_BOT_TOKEN:-}" ]]        || missing+=("SLACK_BOT_TOKEN")
+          [[ -n "${SLACK_KAVITHA_CHANNEL:-}" ]]  || missing+=("SLACK_KAVITHA_CHANNEL")
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::Missing required secret(s): ${missing[*]}"
+            exit 1
+          fi
+          for f in render.py upload_slack.sh routines/kavitha.json routines/morning-prompt-template.md; do
+            [[ -f "$f" ]] || { echo "::error::Missing required file: $f"; exit 1; }
+          done
+          mkdir -p "$WORK_DIR"
+
+      - name: Pre-flight — Slack auth.test
+        run: |
+          set -euo pipefail
+          RESP=$(curl -sS --fail-with-body "https://slack.com/api/auth.test" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN")
+          OK=$(echo "$RESP" | python3 -c "import sys,json;print(json.load(sys.stdin).get('ok',False))")
+          if [[ "$OK" != "True" ]]; then
+            echo "::error::Slack auth.test failed: $RESP"
+            exit 1
+          fi
+          echo "$RESP" | python3 -c "import sys,json;d=json.load(sys.stdin);print(f'Slack OK as {d.get(\"user\")} ({d.get(\"user_id\")})')"
+
+      - name: Trigger Claude routine and capture JSON output
+        run: |
+          set -euo pipefail
+
+          HTTP_CODE=$(curl -sS -o "$RAW_RESPONSE_PATH" -w "%{http_code}" \
+            --max-time 600 \
+            -X POST "https://api.anthropic.com/v1/routines/${ROUTINE_TRIGGER_ID}/run" \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
             -H "anthropic-version: 2023-06-01" \
             -H "Content-Type: application/json" \
-            -d '{}' | tee /tmp/routine_response.json
-          # Extract JSON output written by Claude to the output file
-          # Claude writes its JSON to kavitha_morning.json as part of the prompt
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+            -d '{}')
 
-      - name: Wait for routine to complete and fetch output
-        run: |
-          sleep 60  # allow CCR time to run
-          # In practice: poll for completion or use webhook callback
-          # For now: Claude writes JSON to a known path in the repo or outputs it
-          # The routine prompt writes JSON to /tmp/kavitha_morning.json via Bash tool
+          if ! [[ "$HTTP_CODE" =~ ^2[0-9][0-9]$ ]]; then
+            echo "::error::Routine trigger returned HTTP $HTTP_CODE"
+            cat "$RAW_RESPONSE_PATH" || true
+            exit 1
+          fi
 
-      - name: Render HTML from JSON
+          # Extract the routine's structured JSON output. The Anthropic routines
+          # API may wrap the payload under one of several keys depending on
+          # transport mode; tolerate the common ones, then validate the schema
+          # we actually rely on (a 'brands' list per morning-prompt-template.md).
+          python3 <<'PY'
+          import json, sys, os
+          raw_path = os.environ["RAW_RESPONSE_PATH"]
+          out_path = os.environ["JSON_PATH"]
+          d = json.load(open(raw_path))
+          for key in ("output", "result", "data", "content"):
+              if isinstance(d, dict) and key in d and isinstance(d[key], (dict, list, str)):
+                  d = d[key]
+                  break
+          # If the model output came back as a string, try to parse it.
+          if isinstance(d, str):
+              try:
+                  d = json.loads(d)
+              except Exception as e:
+                  print(f"::error::Routine returned a string that is not valid JSON: {e}", file=sys.stderr)
+                  print(d[:500], file=sys.stderr)
+                  sys.exit(1)
+          if not isinstance(d, dict) or "brands" not in d or not isinstance(d["brands"], list):
+              print("::error::Routine response does not contain a valid morning brief JSON (missing 'brands' list).", file=sys.stderr)
+              print("Response preview:", json.dumps(d)[:500] if not isinstance(d, str) else d[:500], file=sys.stderr)
+              sys.exit(1)
+          json.dump(d, open(out_path, "w"))
+          print(f"Captured morning brief: {len(d.get('brands', []))} brands, "
+                f"{sum(len(b.get('tasks', [])) for b in d['brands'])} tasks, "
+                f"health={d.get('health','?')}")
+          PY
+
+      - name: Render HTML report
         run: |
-          python3 workinx-pm/render.py /tmp/kavitha_morning.json /tmp/kavitha_morning_report.html
+          set -euo pipefail
+          python3 ./render.py "$JSON_PATH" "$HTML_PATH"
+          [[ -s "$HTML_PATH" ]] || { echo "::error::Renderer produced no output at $HTML_PATH"; exit 1; }
+          echo "Rendered $(wc -c < "$HTML_PATH") bytes of HTML"
 
       - name: Upload HTML to Slack
         run: |
-          bash workinx-pm/upload_slack.sh \
-            /tmp/kavitha_morning_report.html \
-            "${{ secrets.SLACK_KAVITHA_CHANNEL }}" \
+          set -euo pipefail
+          bash ./upload_slack.sh \
+            "$HTML_PATH" \
+            "$SLACK_KAVITHA_CHANNEL" \
             "🌅 Morning Brief — Kavitha | $(date +'%d %b %Y')"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Upload debug artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: morning-brief-debug-${{ github.run_id }}
+          path: ${{ env.WORK_DIR }}
+          if-no-files-found: ignore
+          retention-days: 7
